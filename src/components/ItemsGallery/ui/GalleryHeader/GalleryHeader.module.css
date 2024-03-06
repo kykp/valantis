@@ -1,0 +1,19 @@
+.GalleryHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid blanchedalmond;
+}
+.id {
+  flex: 0.3;
+}
+.title {
+  flex: 0.5
+}
+
+.price {
+  flex: 0.1;
+}
+.brand {
+  flex: 0.1;
+}
