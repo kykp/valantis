@@ -7,8 +7,9 @@ const password = 'Valantis';
 interface RequestData {
   action: string;
   params: {
-    offset: number;
-    limit: number;
+    offset?: number;
+    limit?: number;
+    ids?: string[];
   };
 }
 

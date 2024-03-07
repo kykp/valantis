@@ -1,56 +1,46 @@
-import {useFetch} from "@/hooks/useFetch.ts";
-import {ValantisService} from "@/services/ValantisService/ValantisService.ts";
 import {useEffect, useState} from "react";
 import {Item} from "../Item/Item.tsx";
 import {ProductItem} from "../../types/index.ts";
 
-import cls from "./ItemsGallery.module.css";
 import {SkeletonItems} from "@/components/SceletonItems/SceletonItems.tsx";
 import {GalleryHeader} from "../GalleryHeader/GalleryHeader.tsx";
-import {getUniqProducts} from "@/components/ItemsGallery/lib/getUniqProducts.ts";
+import {fetchAllItems} from "@/hooks/useFetchAllItems.ts";
+
+import cls from "./ItemsGallery.module.css";
+import {Pagination} from "@/components/Pagination";
 
 export const ItemsGallery = () => {
-  const [productItems, setProductItems] = useState<ProductItem[]>();
-  const [itemsIds, setItemsIds] = useState<string[]>();
-
-  const [data] = useFetch({
-    service: ValantisService.getData,
-    params: {
-      action: "get_ids",
-      params: {"limit": 47}
-    }
-  });
-
-  const [items, isLoading, error, fetch] = useFetch({
-    service: ValantisService.getData,
-    params: {
-      action: 'get_items',
-      params: {'ids': itemsIds},
-    },
-    isLazy: true,
-  })
+  const [uniqueProductItems, setUniqueProductItems] = useState<ProductItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    data && setItemsIds(data.result);
-  }, [data])
+    const fetchItems = async () => {
+      try {
+        const allItems = await fetchAllItems();
+        setUniqueProductItems(allItems);
+      } catch (error) {
+        console.log("Error fetching items:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  useEffect(() => {
-    itemsIds && fetch()
-  }, [itemsIds]);
+    fetchItems();
+  }, []);
 
-  useEffect(() => {
-    items && setProductItems(items.result);
-  }, [items]);
-
-  const uniqueProductItems = productItems && getUniqProducts(productItems);
+  const totalItems = uniqueProductItems.length;
 
   return (
-    <ul className={cls.ItemsGallery}>
+    <>
+      <Pagination totalItems={totalItems} itemsPerPage={100}/>
       <GalleryHeader/>
-      {uniqueProductItems
-        ? uniqueProductItems.map(item => <Item key={item.id} {...item}/>)
-        : <SkeletonItems/>
-      }
-    </ul>
+      <ul className={cls.ItemsGallery}>
+        {uniqueProductItems && !isLoading
+          ? uniqueProductItems.map(item => <Item key={item.id} {...item}/>)
+          : <SkeletonItems/>
+        }
+      </ul>
+    </>
+
   )
 }
