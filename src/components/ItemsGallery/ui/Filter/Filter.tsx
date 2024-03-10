@@ -3,7 +3,6 @@ import React, {useEffect, useState} from "react";
 
 import {SelectOption} from "@/config/types.ts";
 import cls from "./Filter.module.css";
-import {fetchAllItems} from "@/lib/fetchAllItems.ts";
 import {mapOptions} from "@/components/ItemsGallery/config/mapOptions.ts";
 import {fetchOptions} from "@/lib/fetchOptions.ts";
 import {getUniqIds} from "@/lib/getUniqIds.ts";
@@ -12,22 +11,53 @@ const removeDuplicates = (arr: string[]): string[] => {
   return [...new Set(arr)];
 };
 
-export const Filter = () => {
+interface FilterProps {
+  onChange: (filter: SelectOption) => void;
+}
+export const Filter = React.memo((props: FilterProps) => {
+  const { onChange } = props;
+
   const [productOption, setProductOptions] = useState<SelectOption[]>();
   const [priceOptions, setPriceOptions] = useState<SelectOption[]>();
   const [brandOptions, setBrandOptions] = useState<SelectOption[]>();
 
   const [isLoadingOptions, setIsLoadingOptions] = useState(true);
 
-  const [selectedOption, setSelectedOption] = useState<SelectOption>();
+  const [selectedProduct, setSelectedProduct] = useState<SelectOption | null>(null);
+  const [selectedPrice, setSelectedPrice] = useState<SelectOption | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<SelectOption | null>(null);
 
+
+  const handleSelectChange = (value: SelectOption | null, selectName: string) => {
+    onChange && value && onChange(value);
+
+    switch (selectName) {
+      case 'product':
+        setSelectedProduct(value);
+        setSelectedPrice(null);
+        setSelectedBrand(null);
+        break;
+      case 'price':
+        setSelectedPrice(value);
+        setSelectedProduct(null);
+        setSelectedBrand(null);
+        break;
+      case 'brand':
+        setSelectedBrand(value);
+        setSelectedProduct(null);
+        setSelectedPrice(null);
+        break;
+      default:
+        break;
+    }
+  };
 
   useEffect(() => {
     const fetchIds = async () => {
       setIsLoadingOptions(true);
       const productsName = await fetchOptions('product');
       const uniqProductsName = getUniqIds(productsName);
-      const productsOptions = mapOptions(uniqProductsName)
+      const productsOptions = mapOptions(uniqProductsName, 'product')
       setProductOptions(productsOptions)
       setIsLoadingOptions(false)
     }
@@ -39,7 +69,7 @@ export const Filter = () => {
       setIsLoadingOptions(true);
       const prices = await fetchOptions('price');
       const uniqPrices = getUniqIds(prices);
-      const priceOptions = mapOptions(uniqPrices)
+      const priceOptions = mapOptions(uniqPrices, 'price')
       setPriceOptions(priceOptions)
       setIsLoadingOptions(false);
     }
@@ -52,20 +82,13 @@ export const Filter = () => {
       const brands = await fetchOptions('brand');
       const filteredBrands = brands.filter((el: string | null) => !!el);
       const uniqBrands = removeDuplicates(filteredBrands);
-      const brandOptions = mapOptions(uniqBrands)
+      const brandOptions = mapOptions(uniqBrands, 'brand')
       setBrandOptions(brandOptions)
       setIsLoadingOptions(false)
     }
     fetchIds();
   }, []);
 
-
-
-  const handleChange = (value: SelectOption | null) => {
-    if(value){
-      setSelectedOption(value);
-    }
-  };
 
   return (
     <div className={cls.Filter}>
@@ -75,8 +98,8 @@ export const Filter = () => {
          <label htmlFor="product" className={cls.label}>Product</label>
          <Select
            placeholder={'product'}
-           defaultValue={selectedOption}
-           onChange={handleChange}
+           value={selectedProduct}
+           onChange={(value) => handleSelectChange(value, 'product')}
            options={productOption}
            name={'product'}
            isDisabled={isLoadingOptions}
@@ -86,8 +109,8 @@ export const Filter = () => {
        <label htmlFor="price" className={cls.label}>Price</label>
        <Select
          placeholder={'price'}
-         defaultValue={selectedOption}
-         onChange={handleChange}
+         value={selectedPrice}
+         onChange={(value) => handleSelectChange(value, 'price')}
          options={priceOptions}
          name={'price'}
          isDisabled={isLoadingOptions}
@@ -97,8 +120,8 @@ export const Filter = () => {
        <label htmlFor="brand" className={cls.label}>Brand</label>
        <Select
          placeholder={'brand'}
-         defaultValue={selectedOption}
-         onChange={handleChange}
+         value={selectedBrand}
+         onChange={(value) => handleSelectChange(value, 'brand')}
          options={brandOptions}
          name={'brand'}
          isDisabled={isLoadingOptions}
@@ -107,4 +130,4 @@ export const Filter = () => {
      </div>
     </div>
   )
-}
+})

@@ -3,7 +3,7 @@ import { ValantisService } from "@/services/ValantisService/ValantisService.ts";
 export const fetchAllItems = async (result: string[]) => {
   const response = await ValantisService.getData({
     action: "get_items",
-    params: { ids: result }
+    params: {ids: result}
   });
 
   try {

@@ -1,18 +1,17 @@
-import {ValantisService} from "@/services/ValantisService/ValantisService.ts";
-import {getUniqIds} from "@/lib/getUniqIds.ts";
+import {KeyType, ValantisService} from "@/services/ValantisService/ValantisService.ts";
 
-export const fetchFilteredIds = async () => {
-  const response = await ValantisService.getData(
-    {
-      action: 'filter',
-      params: {product: 'Золотые серьги с бриллиантами и  Аметистами'}
-    }
-  );
+
+export const fetchFilteredIds = async (field: string |  number, filterKey: KeyType) => {
+
+  const params = {
+    action: 'filter',
+    params: {[filterKey]: field}
+  }
+  const response = await ValantisService.getData(params);
 
   try {
     const responseData = await response.json();
-    const result = responseData.result;
-    return getUniqIds(result);
+    return responseData.result;
   } catch (e) {
     console.log('we have some problems', e)
   }

@@ -11,6 +11,7 @@ import cls from "./ItemsGallery.module.css";
 import {SkeletonPagination} from "@/components/SceletonItems/SkeletonPagination.tsx";
 import {fetchAllIds} from "@/lib/fetchAllIds.ts";
 import {fetchFilteredIds} from "@/lib/fetchFilteredIds.ts";
+import {SelectOption} from "@/config/types.ts";
 
 export const ItemsGallery = () => {
   const [uniqIds, setUniqIds] = useState<string[]>([]);
@@ -18,25 +19,11 @@ export const ItemsGallery = () => {
   const [isLoadingItems, setIsLoadingItems] = useState(true)
 
   const [showedIds, setShowedIds] = useState<ProductItem[]>();
-  const [filter, setFilter] = useState();
+  const [filter, setFilter] = useState<SelectOption>();
 
   const itemsPerPage = 50;
 
-  // useEffect(() => {
-  //   const fetchIds = async () => {
-  //     setUniqIds(await fetchAllIds({setLoading: setIsLoadingIds}));
-  //   }
-  //   fetchIds();
-  // }, []);
-  //
-  // useEffect(() => {
-  //   const fetchFilteredItems = async () => {
-  //     await fetchFilteredIds();
-  //   }
-  //   fetchFilteredItems();
-  // }, []);
-
-  const totalItems = uniqIds.length;
+  const totalItems = uniqIds?.length;
 
   const onChangePage = async (page: number) => {
     const startIndex = (page - 1) * itemsPerPage;
@@ -47,9 +34,32 @@ export const ItemsGallery = () => {
     setIsLoadingItems(false);
   }
 
-  const onHandleFilterChange = (filter: string) => {
-    filter && setFilter(filter);
+  const onHandleFilterChange = (filter: SelectOption) => {
+    setFilter(filter);
   }
+
+
+  useEffect(() => {
+    const fetchIds = async () => {
+      setUniqIds(await fetchAllIds({setLoading: setIsLoadingIds}));
+    }
+    fetchIds();
+  }, []);
+
+  useEffect(() => {
+    if (filter) {
+      const filteredData = async () => {
+        setUniqIds(await fetchFilteredIds(filter.label, filter.additionalKey))
+      }
+      filteredData();
+    }
+  }, [filter]);
+
+  useEffect(() => {
+    if(uniqIds) {
+      onChangePage(1);
+    }
+  }, [uniqIds]);
 
   return (
     <>

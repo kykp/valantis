@@ -4,17 +4,21 @@ const uri = 'https://api.valantis.store:41000';
 
 const password = 'Valantis';
 
+export type KeyType = 'product' | 'brand' | 'price';
+
+interface Params {
+  offset?: number;
+  limit?: number;
+  ids?: string[];
+  field?: string;
+  price?: number;
+  brand?: string | null;
+  product?: string;
+}
+
 interface RequestData {
   action: string;
-  params?: {
-    offset?: number;
-    limit?: number;
-    ids?: string[];
-    field?: string;
-    price?: string;
-    brand?: string | null;
-    product?: string;
-  };
+  params?:Params;
 }
 
 const getParams = (requestData: RequestData) => {
@@ -29,5 +33,5 @@ const getParams = (requestData: RequestData) => {
 }
 
 export class ValantisService {
-  static getData = (data:RequestData) => fetch(uri, getParams(data));
+  static getData = (data: { action: string; params: Params }) => fetch(uri, getParams(data));
 }
