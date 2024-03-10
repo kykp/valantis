@@ -1,9 +1,11 @@
 type Acc = {
-  [key: string] : number;
+  [key: string]: number;
 }
 export const getUniqIds = (ids: string[]): string[] => {
+  if(!ids) {
+    throw new Error('нет ид что бы проверить на уникальность')
+  }
   const frequencies: Acc = {};
-
   // Сначала подсчитываем частоту появления каждой строки
   ids.forEach((item: string) => {
     if (!frequencies[item]) {

@@ -1,8 +1,13 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
 .GalleryHeader {
   display: flex;
   align-items: center;
   gap: 10px;
   border-bottom: 2px solid blanchedalmond;
+  margin-top: 25px;
 }
 .id {
   flex: 0.3;

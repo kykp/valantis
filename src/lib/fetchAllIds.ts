@@ -1,7 +1,14 @@
 import {ValantisService} from "@/services/ValantisService/ValantisService.ts";
 import {getUniqIds} from "@/lib/getUniqIds.ts";
 
-export const fetchAllIds = async (setLoading: (isLoading: boolean) => void) => {
+
+interface FetchAllIds {
+  setLoading: (isLoading: boolean) => void;
+}
+
+
+export const fetchAllIds = async (props: FetchAllIds) => {
+  const {setLoading} = props;
   const allItemsIds: string[] = [];
   const limit = 100;
 

@@ -1,0 +1,16 @@
+.Filter {
+  margin-top: 25px;
+  color: black;
+}
+
+.label {
+  color: white;
+}
+
+.filter__items {
+  display: flex;
+  gap: 10px;
+}
+.filter__item {
+  flex: 1;
+}

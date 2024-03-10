@@ -6,10 +6,14 @@ const password = 'Valantis';
 
 interface RequestData {
   action: string;
-  params: {
+  params?: {
     offset?: number;
     limit?: number;
     ids?: string[];
+    field?: string;
+    price?: string;
+    brand?: string | null;
+    product?: string;
   };
 }
 
